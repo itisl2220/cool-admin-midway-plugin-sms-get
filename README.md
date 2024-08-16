@@ -1,37 +1,22 @@
-![](https://cool-js.com/team/gist.jpg)
-
-## 官网
-
-[https://cool-js.com](https://cool-js.com)
-
-[插件开发文档](https://cool-js.com/admin/node/core/plugin.html#使用插件)
-
-## 视频教程
-
-[1、插件开发](https://www.bilibili.com/video/BV1aa4y187jh/)
-
-[2、插件发布与使用](https://www.bilibili.com/video/BV1mw41157bx/)
-
-## README 示例
-
-下面时插件介绍的示例，你可以按照这样的规范写，当然不限于这种形式，你可以自由发挥，只要能表达清楚即可。
-
 ### 介绍
 
-这是个示例插件， 写了一些简单的方法
+调用SMS-Get 商務簡訊服务，发送短信，需要先在SMS-Get注冊賬號並開通，获取 `username` 和 `password`，然后配置到插件中
+
+注意，配置上对应的权限
 
 ### 标识
 
 调用插件的时候需要用到标识，标识是唯一的，不能重复，建议使用英文，不要使用中文，对应插件 `plugin.json` 中的 `key` 字段
 
-- 标识：test
+- 标识：sms-get
 
 ### 配置
 
 ```json
 {
-  "appId": "xxx的appId",
-  "appSecret": "xxx的appSecret"
+  "username": "xxx", // 簡訊平台帳號
+  "password": "xxx",  // 簡訊平台密碼 
+  "template": "【xx】您的验证码是：${code}，请在${expire}分钟内输入。" // 短信模板
 }
 ```
 
@@ -39,26 +24,23 @@
 
 下面是插件提供的一些方法
 
-- show
+- send
 
 ```ts
-  /**
-   * 展示插件信息
-   * @param a 参数a
-   * @param b 参数b
-   * @returns 插件信息
+/**
+   * 发送
+   * @param phone 手机号数组 最多不要超过200个手机号
+   * @param params 参数数组 短信模板参数, 例如: {code: '1234', expire: '10', template: '您的验证码是：${code}，请在${expire}分钟内输入。'}
+   * @returns 返回结果
    */
-  async show(a, b)
-```
-
-- demo
-
-```ts
-  /**
-    * 请求网络示例
-    * @returns 百度的请求结果
-    */
-  async demo()
+  async send(
+    phone: string[],
+    params: {
+      template?: string; // 模板
+      code?: string; // 验证码
+      expire?: string; // 过期时间
+    },
+  )
 ```
 
 ### 调用示例
@@ -67,18 +49,25 @@
 @Inject()
 pluginService: PluginService;
 
-// 获取插件实例
-const instance = await this.pluginService.getInstance('test');
+// 发送
+await this.pluginService.invoke(
+      'sms-get',
+      'send',
+      ['xxxx', 'xxxx'],
+      { code: '1234', expire: '10' }
+    )
 
-// 调用show
-await instance.show(1, 2);
+// 带模板
+await this.pluginService.invoke(
+      'sms-get',
+      'send',
+      ['xxxx', 'xxxx'],
+      { code: '1234', expire: '10', template: '【xx】您的验证码是：${code}，请在${expire}分钟内输入。' }
 
-// 调用demo
-await instance.demo();
-
+    )
 ```
 
 ### 更新日志
 
-- v1.0.0 (2024-04-15)
+- v1.0.0 (2024-08-17)
   - 初始版本

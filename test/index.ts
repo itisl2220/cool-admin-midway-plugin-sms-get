@@ -8,6 +8,9 @@ instance.init(pluginInfo);
 
 (async () => {
   // 调用插件方法
-  const res = await instance.demo();
+  const res = await instance.send(["15385532220"], {
+    code: "123456",
+    expire: "10",
+  });
   console.log(res);
 })();

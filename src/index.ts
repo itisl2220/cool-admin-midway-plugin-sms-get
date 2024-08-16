@@ -1,66 +1,58 @@
 import { BasePlugin } from "@cool-midway/plugin-cli";
 import axios from "axios";
-import fs from "fs";
-import "./other";
 
 /**
  * 描述
  */
-export class CoolPlugin extends BasePlugin {
+export class SmsGetPlugin extends BasePlugin {
   /**
-   * 插件已就绪，注意：单例插件只会执行一次，非单例插件每次调用都会执行
+   * 發送驗證碼
    */
-  async ready() {
-    console.log("插件就绪");
-  }
+  async send(
+    phone: string[],
+    params: {
+      template?: string;
+      code?: string;
+      expire?: string;
+    }
+  ) {
+    const { username, password, template } = this.pluginInfo.config; // 獲取配置
+    if (!username || !password) {
+      throw new Error("請先配置好短信平台的帳號密碼");
+    }
+    if (!template && !params.template) {
+      throw new Error("請先配置好短信平台的模板");
+    }
 
-  /**
-   * 展示插件信息
-   * @param a 参数a
-   * @param b 参数b
-   * @returns 插件信息
-   */
-  async show(a, b) {
-    console.log("传参", a, b);
-    return this.pluginInfo;
-  }
+    if (!phone.length) {
+      throw new Error("號碼不可為空");
+    }
 
-  /**
-   * 使用缓存，使用cool-admin的缓存，开发的时候只是模拟
-   */
-  async useCache() {
-    await this.cache.set("a", "一个项目用COOL就够了");
-    const r = await this.cache.get("a");
-    console.log(r);
-  }
+    if (!params.code) {
+      throw new Error("驗證碼不可為空");
+    }
 
-  /**
-   * 调用其他插件
-   */
-  async usePlugin() {
-    // 获得其他插件，开发的时候无法调试，只有安装到cool-admin中才能调试
-    const plugin = await this.pluginService.getInstance("xxx");
-    console.log(plugin);
-  }
+    let templateId = params.template || template;
+    let paramsStr = "";
+    // 替換模板中 ${code} ${expire}。
+    if (templateId) {
+      paramsStr = templateId
+        .replace(/\${code}/g, params.code)
+        .replace(/\${expire}/g, params.expire || "10");
+    }
 
-  /**
-   * 请求网络示例
-   */
-  async demo() {
-    const res = await axios.get("https://www.baidu.com");
+    const res = await axios.get("http://sms-get.com/api_send.php", {
+      params: {
+        username,
+        password,
+        method: "1",
+        sms_msg: paramsStr,
+        phone: phone.join(","),
+      },
+    });
     return res.data;
-  }
-
-  /**
-   * 读取文件示例
-   */
-  async readFile() {
-    // 如果是本地开发，filePath指向的是插件的根目录的文件
-    const { filePath } = this.pluginInfo.config;
-    const result = fs.readFileSync(filePath);
-    return result.toString();
   }
 }
 
 // 导出插件实例， Plugin名称不可修改
-export const Plugin = CoolPlugin;
+export const Plugin = SmsGetPlugin;

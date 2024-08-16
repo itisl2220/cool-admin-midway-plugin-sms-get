@@ -1,16 +1,16 @@
 {
-    "name": "测试",
-    "key": "test",
-    "hook": "",
-    "singleton": false,
-    "version": "1.0.0",
-    "description": "插件描述",
-    "author": "作者",
-    "logo": "assets/logo.png",
-    "readme": "README.md",
-    "config": {
-        "appId": "@baseDir/1.md",
-        "appSecret": "xxxxx",
-        "filePath": "@baseDir/xxxxx"
-    }
+  "name": "SMS-Get 短信",
+  "key": "sms-get",
+  "hook": "",
+  "singleton": false,
+  "version": "1.0.0",
+  "description": "SMS-Get 國際短信平台",
+  "author": "ITisl",
+  "logo": "assets/logo.png",
+  "readme": "README.md",
+  "config": {
+    "username": "xxx",
+    "password": "xxx",
+    "template": "【xx】您的验证码是：${code}，请在${expire}分钟内输入。"
+  }
 }
